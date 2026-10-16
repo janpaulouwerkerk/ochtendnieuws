@@ -371,10 +371,10 @@ ook niet wanneer een andere bron of taal dezelfde gebeurtenis opnieuw beschrijft
 ontwikkeling over hetzelfde onderwerp mag wel: benoem dan precies wat er nieuw is. Als minder dan
 vijf nieuwe gebeurtenissen overblijven, retourneer dan een lege articles-lijst in plaats van op te vullen.
 Geef JSON: {"articles": [{"id": "exact uit bron", "sourceUrl": "exact uit bron",
-"publishedAt": "exact uit bron", "title": "feitelijke kop, maximaal 160 tekens",
-"summary": "feitelijke samenvatting van 2 à 3 zinnen, maximaal 600 tekens",
-"importance": "waarom dit belangrijk kan zijn, maximaal 300 tekens",
-"opportunity": "praktische kans, maximaal 300 tekens",
+"publishedAt": "exact uit bron", "title": "feitelijke kop, maximaal 140 tekens",
+"summary": "feitelijke samenvatting van 2 zinnen, maximaal 400 tekens",
+"importance": "waarom dit belangrijk kan zijn, maximaal 180 tekens",
+"opportunity": "praktische kans, maximaal 180 tekens",
 "status": "Bevestigd|Aangekondigd|Beschikbaar|Onderzoek|In ontwikkeling|Bronbericht|Onzeker",
 "category": "Modellen|Agents|Toepassingen|Onderzoek|AI-labs"}]}.
 Onderbouw importance en opportunity met expliciete bronfeiten. Markeer interpretatie met
@@ -450,6 +450,41 @@ def model_http_error(error: HTTPError, token: str) -> str:
     return message
 
 
+def decode_model_response(raw: bytes, token: str) -> Any:
+    """Parse the HTTP envelope and assistant JSON separately, without logging content."""
+    try:
+        response = json.loads(raw)
+    except json.JSONDecodeError as exc:
+        raise PublicationError(f"Buitenste modelrespons is geen geldige JSON (positie={exc.pos}, "
+                               f"regel={exc.lineno}, kolom={exc.colno}, bytes={len(raw)})") from exc
+    except UnicodeDecodeError as exc:
+        raise PublicationError(f"Buitenste modelrespons bevat ongeldige tekstcodering (bytes={len(raw)})") from exc
+    try:
+        choice = response["choices"][0]
+        content = choice["message"]["content"]
+        finish_reason = choice.get("finish_reason", "onbekend")
+    except (KeyError, IndexError, TypeError, AttributeError) as exc:
+        raise PublicationError(f"Modelrespons mist een geldige tekstkeuze (bytes={len(raw)})") from exc
+    # Provider metadata is untrusted too; never echo tokens or arbitrary long text.
+    reason = (finish_reason if isinstance(finish_reason, str) and finish_reason in
+              {"stop", "length", "content_filter", "tool_calls", "function_call"} else "onbekend")
+    chars = len(content) if isinstance(content, str) else 0
+    metadata = f"finish_reason={reason}, tekens={chars}"
+    if finish_reason == "length":
+        raise PublicationError(f"Modeluitvoer afgebroken door uitvoerlimiet ({metadata}); onvolledige modeltekst verworpen")
+    if not isinstance(content, str) or not content.strip():
+        raise PublicationError(f"Modelrespons bevat geen modeltekst ({metadata})")
+    text = content.strip()
+    fenced = re.fullmatch(r"```(?:json)?\s*(.*?)\s*```", text, re.DOTALL | re.IGNORECASE)
+    if fenced:
+        text = fenced.group(1)
+    try:
+        return json.loads(text)
+    except json.JSONDecodeError as exc:
+        raise PublicationError(f"Modeltekst is geen geldige JSON (positie={exc.pos}, regel={exc.lineno}, "
+                               f"kolom={exc.colno}, {metadata})") from exc
+
+
 def model_articles(candidates: list[Candidate], config: dict[str, Any], now: datetime,
                    provider: tuple[str, str, str], zone: ZoneInfo,
                    archive: dict[str, Any] | None = None, replacing_date: str | None = None) -> list[dict[str, Any]]:
@@ -472,7 +507,7 @@ def model_articles(candidates: list[Candidate], config: dict[str, Any], now: dat
     while len(json.dumps(context, ensure_ascii=False)) > 19_000 and len(evidence) > 5:
         evidence.pop()
         context["untrustedSourceData"].pop()
-    payload = {"model": model, "temperature": 0.1, "max_tokens": 3500,
+    payload = {"model": model, "temperature": 0.1, "max_tokens": 4000,
                "response_format": {"type": "json_object"},
                "messages": [{"role": "system", "content": SYSTEM_PROMPT},
                             {"role": "user", "content": json.dumps(context, ensure_ascii=False)}]}
@@ -490,8 +525,7 @@ def model_articles(candidates: list[Candidate], config: dict[str, Any], now: dat
                 retry_after = exc.headers.get("Retry-After", "") if exc.headers else ""
                 delay = min(30, max(1, int(retry_after))) if retry_after.isdigit() else 2 ** (attempt + 1)
                 clock.sleep(delay)
-        content = json.loads(raw)["choices"][0]["message"]["content"]
-        return validate_model_output(json.loads(content), evidence, config["articlesPerEdition"], zone)
+        return validate_model_output(decode_model_response(raw, token), evidence, config["articlesPerEdition"], zone)
     except HTTPError as exc:
         raise PublicationError(model_http_error(exc, token)) from exc
     except (URLError, OSError, KeyError, IndexError, TypeError, ValueError) as exc:

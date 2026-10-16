@@ -292,6 +292,37 @@ class ModelTests(unittest.TestCase):
         self.assertNotIn("secret-token", diagnostic)
         self.assertLess(len(diagnostic), 460)
 
+    def test_complete_json_code_fence_is_accepted_then_strictly_validated(self):
+        content = "```json\n" + json.dumps(self.output) + "\n```"
+        response = json.dumps({"choices": [{"message": {"content": content}, "finish_reason": "stop"}]}).encode()
+        output = news.decode_model_response(response, "secret-token")
+        self.assertEqual(len(news.validate_model_output(output, self.candidates, 5, ZONE)), 5)
+        output["articles"][0]["sourceUrl"] = "https://evil.example.org"
+        with self.assertRaises(news.PublicationError):
+            news.validate_model_output(output, self.candidates, 5, ZONE)
+
+    def test_outer_and_inner_json_errors_have_distinct_safe_diagnostics(self):
+        with self.assertRaises(news.PublicationError) as outer:
+            news.decode_model_response(b"not json secret-token", "secret-token")
+        self.assertIn("Buitenste modelrespons", str(outer.exception))
+        self.assertIn("positie=0", str(outer.exception))
+        content = '{"articles": [ secret-token'
+        response = json.dumps({"choices": [{"message": {"content": content}, "finish_reason": "stop"}]}).encode()
+        with self.assertRaises(news.PublicationError) as inner:
+            news.decode_model_response(response, "secret-token")
+        self.assertIn("Modeltekst", str(inner.exception))
+        self.assertIn("finish_reason=stop", str(inner.exception))
+        self.assertIn(f"tekens={len(content)}", str(inner.exception))
+        self.assertIn("positie=", str(inner.exception))
+        self.assertNotIn("secret-token", str(inner.exception) + str(outer.exception))
+
+    def test_output_length_limit_is_reported_before_json_parsing(self):
+        response = json.dumps({"choices": [{"message": {"content": '{"articles":['}, "finish_reason": "length"}]}).encode()
+        with self.assertRaises(news.PublicationError) as raised:
+            news.decode_model_response(response, "secret-token")
+        self.assertIn("afgebroken door uitvoerlimiet", str(raised.exception))
+        self.assertIn("finish_reason=length", str(raised.exception))
+
 
 class PublicationTests(unittest.TestCase):
     def test_dst_schedules_publish_once_with_amsterdam_morning_window(self):
