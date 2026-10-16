@@ -426,6 +426,30 @@ def validate_model_output(output: dict[str, Any], candidates: list[Candidate], c
     return result
 
 
+def model_http_error(error: HTTPError, token: str) -> str:
+    """Expose bounded provider diagnostics without logging requests or credentials."""
+    message = f"Modelverwerking mislukt (HTTP {error.code})"
+    try:
+        body = json.loads(error.read(8192))
+    except (OSError, ValueError, TypeError, AttributeError):
+        return message
+    detail = body.get("error", body) if isinstance(body, dict) else None
+    if not isinstance(detail, dict):
+        return message
+    for field, limit in (("code", 80), ("message", 320)):
+        value = detail.get(field)
+        if not isinstance(value, (str, int)):
+            continue
+        text = str(value)
+        if token:
+            text = text.replace(token, "[REDACTED]")
+        text = re.sub(r"\bBearer\s+[A-Za-z0-9._~+/-]+=*", "Bearer [REDACTED]", text, flags=re.IGNORECASE)
+        text = re.sub(r"[\x00-\x1f\x7f]+|\s+", " ", text).strip()
+        if text:
+            message += f"; {field}={text[:limit]}"
+    return message
+
+
 def model_articles(candidates: list[Candidate], config: dict[str, Any], now: datetime,
                    provider: tuple[str, str, str], zone: ZoneInfo,
                    archive: dict[str, Any] | None = None, replacing_date: str | None = None) -> list[dict[str, Any]]:
@@ -468,7 +492,9 @@ def model_articles(candidates: list[Candidate], config: dict[str, Any], now: dat
                 clock.sleep(delay)
         content = json.loads(raw)["choices"][0]["message"]["content"]
         return validate_model_output(json.loads(content), evidence, config["articlesPerEdition"], zone)
-    except (HTTPError, URLError, OSError, KeyError, IndexError, TypeError, ValueError) as exc:
+    except HTTPError as exc:
+        raise PublicationError(model_http_error(exc, token)) from exc
+    except (URLError, OSError, KeyError, IndexError, TypeError, ValueError) as exc:
         # Never include model request bodies or authorization headers in logs.
         raise PublicationError(f"Modelverwerking mislukt ({type(exc).__name__})") from exc
 

@@ -263,6 +263,35 @@ class ModelTests(unittest.TestCase):
         self.assertGreaterEqual(len(context["untrustedSourceData"]), 5)
         self.assertIn("Herhaal geen nieuwsgebeurtenis", body["messages"][0]["content"])
 
+    def test_model_http_diagnostics_include_status_and_redact_credentials(self):
+        token = "github_pat_private_fixture_secret"
+        body = {"error": {"code": "permission_denied", "message":
+                f"Token {token} lacks models:read.\nAuthorization: Bearer other-secret\x00 retry later."}}
+        error = HTTPError("https://models.github.ai", 403, "Forbidden", {}, io.BytesIO(json.dumps(body).encode()))
+        with patch.object(news, "urlopen", side_effect=error):
+            with self.assertRaises(news.PublicationError) as raised:
+                news.model_articles(self.candidates, CONFIG, NOW,
+                                    ("https://models.github.ai/inference/chat/completions", token, "github"), ZONE)
+        diagnostic = str(raised.exception)
+        self.assertIn("HTTP 403", diagnostic)
+        self.assertIn("code=permission_denied", diagnostic)
+        self.assertIn("lacks models:read", diagnostic)
+        self.assertNotIn(token, diagnostic)
+        self.assertNotIn("other-secret", diagnostic)
+        self.assertNotIn("\n", diagnostic)
+        self.assertNotIn("\x00", diagnostic)
+
+    def test_model_http_diagnostics_bound_reads_and_ignore_non_json_bodies(self):
+        stream = io.BytesIO(b"<html>secret-token should never be printed</html>" + b"x" * 9000)
+        error = HTTPError("https://models.github.ai", 502, "Bad gateway", {}, stream)
+        self.assertEqual(news.model_http_error(error, "secret-token"), "Modelverwerking mislukt (HTTP 502)")
+        self.assertEqual(stream.tell(), 8192)
+        body = {"error": {"code": "x" * 500, "message": "secret-token " * 100}}
+        error = HTTPError("https://models.github.ai", 400, "Bad request", {}, io.BytesIO(json.dumps(body).encode()))
+        diagnostic = news.model_http_error(error, "secret-token")
+        self.assertNotIn("secret-token", diagnostic)
+        self.assertLess(len(diagnostic), 460)
+
 
 class PublicationTests(unittest.TestCase):
     def test_dst_schedules_publish_once_with_amsterdam_morning_window(self):

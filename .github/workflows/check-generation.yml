@@ -36,7 +36,15 @@ jobs:
               capture_output=True, text=True,
           )
           print(result.stderr)
+          def report_error(title):
+              message = result.stderr[-6000:]
+              for original, escaped in [('%', '%25'), ('\r', '%0D'), ('\n', '%0A')]:
+                  message = message.replace(original, escaped)
+              print(f'::error title={title}::{message}')
+
           assert path.read_bytes() == original, 'De controle heeft de opgeslagen editie gewijzigd.'
+          if result.returncode != 0:
+              report_error('Nieuwsgeneratie mislukt')
           assert result.returncode == 0, 'De dagelijkse generatie is niet geslaagd.'
           document = json.loads(result.stdout)
           today = datetime.now(ZoneInfo('Europe/Amsterdam')).date().isoformat()
@@ -45,7 +53,10 @@ jobs:
           assert len(articles) == 5, 'De editie bevat niet exact vijf artikelen.'
           assert len({a['id'] for a in articles}) == 5, 'Herhaalde artikel-id.'
           assert len({a['source']['url'] for a in articles}) == 5, 'Herhaalde bron-URL.'
-          assert document['sourceNote'].startswith('AI-samenvattingen'), (
+          model_used = document['sourceNote'].startswith('AI-samenvattingen')
+          if not model_used:
+              report_error('Modeltoegang nog niet bevestigd')
+          assert model_used, (
               'De bronfallback werkt, maar modeltoegang is nog niet bevestigd. Zie de log hierboven.'
           )
           print(f'Geslaagd: vijf AI-samenvattingen voor {today}; de bestaande editie is behouden.')

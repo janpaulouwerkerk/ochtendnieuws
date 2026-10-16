@@ -4,14 +4,11 @@ Een zelfstandige Nederlandse nieuwssite met vijf AI-berichten per dagelijkse edi
 
 ## Huidige status
 
-Het werkproject staat lokaal klaar. **Er is vanuit dit project nog geen website in de cloud gepubliceerd en de dagelijkse cloudtaak is nog niet actief.** De bestaande persoonlijke nieuwstaak is niet via dit project gekoppeld; de selectie wordt bepaald door de meegeleverde briefing en bronnenconfiguratie.
+De website staat op https://janpaulouwerkerk.github.io/ochtendnieuws/. De eerste GitHub Pages-publicatie is geslaagd en de publieke website is gecontroleerd op desktop en mobiel: vijf artikelen, zoeken, categorieën, artikeldialogen en bronlinks werken.
 
-De publicatie is toegestaan, maar het beschikbare GitHub-accounttoken kan geen repositories maken of Pages-instellingen wijzigen. De poging om een repository te maken is met HTTP 403 geweigerd; er is daarbij geen repository aangemaakt. Het token kan wel bestanden, workflows en Actions beheren in een toegankelijke repository. Daarom zijn twee handmatige stappen nodig:
+De dagelijkse cloudtaak is ingesteld op rond 08:00 Europe/Amsterdam. De aanvullende controle van echte modelgeneratie wordt nog onderzocht; de huidige eerste editie blijft daarbij behouden. De bestaande persoonlijke nieuwstaak is niet rechtstreeks gekoppeld; de selectie volgt `config/briefing.json` en `config/feeds.json`.
 
-1. Maak op GitHub een **nieuwe openbare repository `ochtendnieuws`** in je eigen account en vink **Add a README file** aan. Voeg geen andere bestanden toe.
-2. Open in die repository **Settings → Pages → Build and deployment → Source** en kies **GitHub Actions**.
-
-Daarna kan het project worden geüpload met de expliciete optie `--initialize-existing`. Deze controleert de eigenaar, openbare zichtbaarheid, één eerste commit met alleen `README.md` en de afwezigheid van extra branches of tags. Een geheel lege repository wordt ook ondersteund: het script maakt dan eerst een README-stub. De stub wordt vervangen door de projectinhoud; bestaande projecten worden geweigerd. Alleen `--publish` maakt netwerkverzoeken; standaard toont het script een lokaal publicatieplan.
+De repository en Pages zijn ingericht. Gebruik `--initialize-existing` uitsluitend voor een nieuwe installatie met een lege repository of eerste README-stub. De actieve website wordt bijgewerkt met normale commits en de Actions-workflows.
 
 ## Lokaal bekijken
 
@@ -66,7 +63,7 @@ python3 scripts/deploy_github.py --dry-run --repo ochtendnieuws
 
 Het plan toont de nieuwe repositorynaam, het aantal projectbestanden en het publicatiegedrag. Alleen projectmappen, README, packageconfiguratie en `.gitignore` worden opgenomen. Caches, lokale omgevingen, `.env`-bestanden, sleutels en symbolische links worden niet geüpload.
 
-Na de twee bovenstaande handmatige stappen kan de daadwerkelijke upload als volgt worden uitgevoerd:
+Alleen voor een nieuwe installatie: maak een nieuwe openbare repository met uitsluitend een eerste README en kies **Settings → Pages → Source → GitHub Actions**. Daarna kan de initiële upload als volgt worden uitgevoerd:
 
 ```bash
 # Stel GH_TOKEN veilig in via je terminal- of secretmanager.
@@ -104,4 +101,4 @@ node --check public/app.js
 python3 -m py_compile scripts/update_news.py scripts/deploy_github.py
 ```
 
-De tests gebruiken lokale bronvoorbeelden en mocks; zij bewijzen geen beschikbaarheid van RSS-bronnen, modeltoegang of hosting. Daarvoor moet na toestemming een echte publicatierun worden gecontroleerd. Zowel de dagelijkse update als de website blijven onafhankelijk van ChatGPT-plug-ins.
+De tests gebruiken lokale bronvoorbeelden en mocks; zij bewijzen geen beschikbaarheid van RSS-bronnen, modeltoegang of hosting. De publieke website is met een echte Pages-run gecontroleerd. De aparte workflow `Controleer dagelijkse nieuwsgeneratie` test modeltoegang en actuele bronnen zonder het opgeslagen archief te vervangen. Zowel de dagelijkse update als de website blijven onafhankelijk van ChatGPT-plug-ins.
