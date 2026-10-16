@@ -25,7 +25,7 @@ NOW = datetime(2026, 10, 16, 6, 15, tzinfo=UTC)
 ZONE = ZoneInfo("Europe/Amsterdam")
 CONFIG = {"title": "Ochtend.", "description": "Je dagelijkse AI-briefing", "timeZone": "Europe/Amsterdam",
           "publicationTime": "08:00", "morningWindowHours": 2, "articlesPerEdition": 5,
-          "preferredHours": 24, "fallbackDays": 7, "model": "openai/gpt-4.1-mini"}
+          "preferredHours": 24, "fallbackDays": 7, "model": "gpt-4.1-mini"}
 DESCRIPTION = ("OpenAI heeft een nieuw AI-model aangekondigd voor het samenvatten van documenten. "
                "Volgens de aankondiging kunnen ontwikkelaars het model vanaf vandaag via de API testen.")
 TITLES = ["OpenAI brengt GPT-6 voor het samenvatten van juridische documenten",
@@ -213,11 +213,11 @@ class ModelTests(unittest.TestCase):
             with self.subTest(count=count), self.assertRaises(news.InsufficientNewsError):
                 news.validate_model_output({"articles": self.output["articles"][:count]}, self.candidates, 5, ZONE)
 
-    def test_provider_credentials_are_optional_and_explicit_token_takes_priority(self):
+    def test_only_explicit_openai_key_enables_inference(self):
         self.assertIsNone(news.model_provider({}))
-        self.assertEqual(news.model_provider({"GH_MODELS_TOKEN": "github", "OPENAI_API_KEY": "openai"})[2], "github")
+        self.assertIsNone(news.model_provider({"GH_MODELS_TOKEN": "retired", "GITHUB_TOKEN": "repo"}))
         self.assertEqual(news.model_provider({"OPENAI_API_KEY": "openai", "GITHUB_TOKEN": "repo"})[2], "openai")
-        self.assertEqual(news.model_provider({"GITHUB_TOKEN": "repo"})[2], "github")
+        self.assertIsNone(news.model_provider({"GITHUB_TOKEN": "repo"}))
 
     def test_model_request_keeps_evidence_in_untrusted_data_and_caps_input(self):
         pool = [candidate(index, summary=DESCRIPTION * 30) for index in range(30)]
@@ -227,7 +227,7 @@ class ModelTests(unittest.TestCase):
             row["summary"] = DESCRIPTION
         response = json.dumps({"choices": [{"message": {"content": json.dumps(output)}}]}).encode()
         with patch.object(news, "urlopen", return_value=io.BytesIO(response)) as call:
-            news.model_articles(pool, CONFIG, NOW, ("https://models.github.ai/inference/chat/completions", "token", "github"), ZONE)
+            news.model_articles(pool, CONFIG, NOW, ("https://api.openai.com/v1/chat/completions", "token", "openai"), ZONE)
         request = call.call_args.args[0]
         body = json.loads(request.data)
         self.assertIn("ONBETROUWBARE BRONDATA", body["messages"][0]["content"])
@@ -238,10 +238,10 @@ class ModelTests(unittest.TestCase):
 
     def test_transient_rate_limit_retries_without_losing_validation(self):
         response = json.dumps({"choices": [{"message": {"content": json.dumps(self.output)}}]}).encode()
-        error = HTTPError("https://models.github.ai", 429, "rate limited", {"Retry-After": "2"}, None)
+        error = HTTPError("https://api.openai.com", 429, "rate limited", {"Retry-After": "2"}, None)
         with patch.object(news, "urlopen", side_effect=[error, io.BytesIO(response)]) as call, patch.object(news.clock, "sleep") as sleep:
             self.assertEqual(len(news.model_articles(self.candidates, CONFIG, NOW,
-                             ("https://models.github.ai/inference/chat/completions", "token", "github"), ZONE)), 5)
+                             ("https://api.openai.com/v1/chat/completions", "token", "openai"), ZONE)), 5)
         self.assertEqual(call.call_count, 2)
         sleep.assert_called_once_with(2)
 
@@ -255,7 +255,7 @@ class ModelTests(unittest.TestCase):
             row["summary"] = DESCRIPTION
         response = json.dumps({"choices": [{"message": {"content": json.dumps(output)}}]}).encode()
         with patch.object(news, "urlopen", return_value=io.BytesIO(response)) as call:
-            news.model_articles(pool, CONFIG, NOW, ("https://models.github.ai/inference/chat/completions", "token", "github"), ZONE, archive)
+            news.model_articles(pool, CONFIG, NOW, ("https://api.openai.com/v1/chat/completions", "token", "openai"), ZONE, archive)
         body = json.loads(call.call_args.args[0].data)
         context = json.loads(body["messages"][1]["content"])
         self.assertEqual(len(context["untrustedRecentCoverage"]), 35)
@@ -267,11 +267,11 @@ class ModelTests(unittest.TestCase):
         token = "github_pat_private_fixture_secret"
         body = {"error": {"code": "permission_denied", "message":
                 f"Token {token} lacks models:read.\nAuthorization: Bearer other-secret\x00 retry later."}}
-        error = HTTPError("https://models.github.ai", 403, "Forbidden", {}, io.BytesIO(json.dumps(body).encode()))
+        error = HTTPError("https://api.openai.com", 403, "Forbidden", {}, io.BytesIO(json.dumps(body).encode()))
         with patch.object(news, "urlopen", side_effect=error):
             with self.assertRaises(news.PublicationError) as raised:
                 news.model_articles(self.candidates, CONFIG, NOW,
-                                    ("https://models.github.ai/inference/chat/completions", token, "github"), ZONE)
+                                    ("https://api.openai.com/v1/chat/completions", token, "openai"), ZONE)
         diagnostic = str(raised.exception)
         self.assertIn("HTTP 403", diagnostic)
         self.assertIn("code=permission_denied", diagnostic)
@@ -283,11 +283,11 @@ class ModelTests(unittest.TestCase):
 
     def test_model_http_diagnostics_bound_reads_and_ignore_non_json_bodies(self):
         stream = io.BytesIO(b"<html>secret-token should never be printed</html>" + b"x" * 9000)
-        error = HTTPError("https://models.github.ai", 502, "Bad gateway", {}, stream)
+        error = HTTPError("https://api.openai.com", 502, "Bad gateway", {}, stream)
         self.assertEqual(news.model_http_error(error, "secret-token"), "Modelverwerking mislukt (HTTP 502)")
         self.assertEqual(stream.tell(), 8192)
         body = {"error": {"code": "x" * 500, "message": "secret-token " * 100}}
-        error = HTTPError("https://models.github.ai", 400, "Bad request", {}, io.BytesIO(json.dumps(body).encode()))
+        error = HTTPError("https://api.openai.com", 400, "Bad request", {}, io.BytesIO(json.dumps(body).encode()))
         diagnostic = news.model_http_error(error, "secret-token")
         self.assertNotIn("secret-token", diagnostic)
         self.assertLess(len(diagnostic), 460)
@@ -432,7 +432,7 @@ class PublicationTests(unittest.TestCase):
             def reject_four(*args, **kwargs):
                 return news.validate_model_output(model_output(candidates[:4]), candidates, 5, ZONE)
             with patch.object(news, "ROOT", root), patch.object(news, "collect_candidates", return_value=candidates), \
-                    patch.object(news, "model_provider", return_value=("endpoint", "token", "github")), \
+                    patch.object(news, "model_provider", return_value=("endpoint", "token", "openai")), \
                     patch.object(news, "model_articles", side_effect=reject_four):
                 self.assertEqual(news.main(["--date", "2026-10-16"]), 1)
             self.assertEqual(path.read_bytes(), before)

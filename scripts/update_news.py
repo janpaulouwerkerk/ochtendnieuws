@@ -385,12 +385,8 @@ Maak geen nieuw bronadres of id. Behoud publicatiedata exact. Geen markdown of e
 
 def model_provider(environ: Any = None) -> tuple[str, str, str] | None:
     env = os.environ if environ is None else environ
-    if env.get("GH_MODELS_TOKEN"):
-        return ("https://models.github.ai/inference/chat/completions", env["GH_MODELS_TOKEN"], "github")
     if env.get("OPENAI_API_KEY"):
         return ("https://api.openai.com/v1/chat/completions", env["OPENAI_API_KEY"], "openai")
-    if env.get("GITHUB_TOKEN"):
-        return ("https://models.github.ai/inference/chat/completions", env["GITHUB_TOKEN"], "github")
     return None
 
 
@@ -489,10 +485,10 @@ def model_articles(candidates: list[Candidate], config: dict[str, Any], now: dat
                    provider: tuple[str, str, str], zone: ZoneInfo,
                    archive: dict[str, Any] | None = None, replacing_date: str | None = None) -> list[dict[str, Any]]:
     endpoint, token, kind = provider
-    model = config.get("model", "openai/gpt-4.1-mini")
+    model = config.get("model", "gpt-4.1-mini")
     if kind == "openai":
         model = model.removeprefix("openai/")
-    # GitHub Models free-tier input limits are small. Keep this below roughly 8k tokens.
+    # Bound source context to keep inference costs and irrelevant input small.
     evidence = candidates[:18]
     recent_coverage = []
     for edition in (archive or {}).get("editions", []):

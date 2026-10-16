@@ -7,5 +7,5 @@
   "articlesPerEdition": 5,
   "preferredHours": 24,
   "fallbackDays": 7,
-  "model": "openai/gpt-4.1-mini"
+  "model": "gpt-4.1-mini"
 }

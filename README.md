@@ -6,7 +6,7 @@ Een zelfstandige Nederlandse nieuwssite met vijf AI-berichten per dagelijkse edi
 
 De website staat op https://janpaulouwerkerk.github.io/ochtendnieuws/. De eerste GitHub Pages-publicatie is geslaagd en de publieke website is gecontroleerd op desktop en mobiel: vijf artikelen, zoeken, categorieën, artikeldialogen en bronlinks werken.
 
-De dagelijkse cloudtaak is ingesteld op rond 08:00 Europe/Amsterdam. De standaardupdate selecteert vijf Nederlandse bronberichten en bewaart eerdere edities. Een afzonderlijke cloudcontrole test die generatie zonder de huidige editie te vervangen. Automatische aanvullende AI-duiding is optioneel en vereist een eigen OpenAI-API-sleutel. De bestaande persoonlijke nieuwstaak is niet rechtstreeks gekoppeld; de selectie volgt `config/briefing.json` en `config/feeds.json`.
+De dagelijkse cloudtaak is ingesteld op rond 08:00 Europe/Amsterdam. De standaardupdate selecteert vijf Nederlandse bronberichten en bewaart eerdere edities. Een echte cloudcontrole heeft vijf Nederlandse bronberichten geselecteerd zonder de huidige editie of het archief te wijzigen. Automatische aanvullende AI-duiding is optioneel en vereist een eigen OpenAI-API-sleutel. De bestaande persoonlijke nieuwstaak is niet rechtstreeks gekoppeld; de selectie volgt `config/briefing.json` en `config/feeds.json`.
 
 De repository en Pages zijn ingericht. Gebruik `--initialize-existing` uitsluitend voor een nieuwe installatie met een lege repository of eerste README-stub. De actieve website wordt bijgewerkt met normale commits en de Actions-workflows.
 
@@ -103,4 +103,6 @@ node --check public/app.js
 python3 -m py_compile scripts/update_news.py scripts/deploy_github.py
 ```
 
-De tests gebruiken lokale bronvoorbeelden en mocks; zij bewijzen geen beschikbaarheid van RSS-bronnen, modeltoegang of hosting. De publieke website is met een echte Pages-run gecontroleerd. De aparte workflow `Controleer dagelijkse nieuwsgeneratie` test modeltoegang en actuele bronnen zonder het opgeslagen archief te vervangen. Zowel de dagelijkse update als de website blijven onafhankelijk van ChatGPT-plug-ins.
+De tests gebruiken lokale bronvoorbeelden en mocks; zij bewijzen geen beschikbaarheid van RSS-bronnen, modeltoegang of hosting. De publieke website is met een echte Pages-run gecontroleerd. De aparte workflow `Controleer dagelijkse nieuwsgeneratie` heeft actuele bronnen en de selectie van vijf berichten gecontroleerd zonder het opgeslagen archief te vervangen. Zowel de dagelijkse update als de website blijven onafhankelijk van ChatGPT-plug-ins.
+
+De aanvullende toegangstest voor Copilot CLI is geweigerd door de accountinstellingen. Voor gebruik daarvan moet de eigenaar eerst de toegang of het toepasselijke plan instellen op https://github.com/settings/copilot. Copilot wordt niet door de dagelijkse bronselectie aangeroepen. Als alternatief ondersteunt de updater de hierboven genoemde optionele OpenAI-sleutel.
