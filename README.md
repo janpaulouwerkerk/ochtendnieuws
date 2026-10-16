@@ -6,7 +6,7 @@ Een zelfstandige Nederlandse nieuwssite met vijf AI-berichten per dagelijkse edi
 
 De website staat op https://janpaulouwerkerk.github.io/ochtendnieuws/. De eerste GitHub Pages-publicatie is geslaagd en de publieke website is gecontroleerd op desktop en mobiel: vijf artikelen, zoeken, categorieën, artikeldialogen en bronlinks werken.
 
-De dagelijkse cloudtaak is ingesteld op rond 08:00 Europe/Amsterdam. De aanvullende controle van echte modelgeneratie wordt nog onderzocht; de huidige eerste editie blijft daarbij behouden. De bestaande persoonlijke nieuwstaak is niet rechtstreeks gekoppeld; de selectie volgt `config/briefing.json` en `config/feeds.json`.
+De dagelijkse cloudtaak is ingesteld op rond 08:00 Europe/Amsterdam. De standaardupdate selecteert vijf Nederlandse bronberichten en bewaart eerdere edities. Een afzonderlijke cloudcontrole test die generatie zonder de huidige editie te vervangen. Automatische aanvullende AI-duiding is optioneel en vereist een eigen OpenAI-API-sleutel. De bestaande persoonlijke nieuwstaak is niet rechtstreeks gekoppeld; de selectie volgt `config/briefing.json` en `config/feeds.json`.
 
 De repository en Pages zijn ingericht. Gebruik `--initialize-existing` uitsluitend voor een nieuwe installatie met een lege repository of eerste README-stub. De actieve website wordt bijgewerkt met normale commits en de Actions-workflows.
 
@@ -48,9 +48,11 @@ python3 scripts/update_news.py --force
 
 De voorkeur gaat naar berichten uit de laatste 24 uur. Als er te weinig geschikte nieuwe berichten zijn, mag de selectie tot zeven dagen terugkijken; de oorspronkelijke brondatum blijft zichtbaar. De updater filtert eerder gebruikte bron-URL's, identifiers en overeenkomende titels. Het herkennen van dezelfde gebeurtenis bij verschillende bronnen blijft een beste poging; volledige semantische ontdubbeling is niet gegarandeerd. Er worden geen nieuwsfeiten verzonnen om het dagquotum op te vullen. Bij te weinig geschikte berichten of ongeldige uitvoer stopt de updater en blijft de bestaande editie behouden.
 
-Een taalmodel kan internationale bronnen vertalen en Nederlandse samenvattingen en duiding maken. De updater gebruikt, in volgorde van beschikbaarheid, `GH_MODELS_TOKEN`, `OPENAI_API_KEY` of `GITHUB_TOKEN`. GitHub Models gebruikt standaard `openai/gpt-4.1-mini`; bij OpenAI wordt de providerprefix verwijderd. Modelondersteuning, toegangsrechten, quota en beschikbaarheid zijn afhankelijk van het account en worden pas bij een echte run vastgesteld. Met een OpenAI-sleutel kunnen API-kosten ontstaan.
+De standaardinstelling heeft geen modeltoken nodig: de updater selecteert vijf Nederlandstalige bronberichten met korte bronuittreksels. Belang en praktijkkansen worden in deze bronmodus niet afzonderlijk beoordeeld. Als er te weinig geschikte nieuwe bronberichten zijn, blijft de vorige editie behouden en meldt de workflow een fout.
 
-Zonder werkend modeltoken probeert de updater vijf Nederlandstalige bronberichten met korte bronuittreksels te publiceren. Ook bij een modelfout wordt deze bronfallback geprobeerd. Als daarvoor onvoldoende geschikte berichten beschikbaar zijn, stopt de update. Bronlinks en brondata worden gecontroleerd; er is geen menselijke redactie die modelteksten vóór publicatie nakijkt.
+Voor Nederlandse AI-samenvattingen en extra duiding kan optioneel `OPENAI_API_KEY` als repositorysecret worden ingesteld. Alleen dan gebruikt de updater de OpenAI-API, standaard met het geconfigureerde model `gpt-4.1-mini`. Daarbij kunnen API-kosten ontstaan. Een modelfout wordt gemeld en de Nederlandse bronselectie wordt als vangnet geprobeerd. De aparte cloudcontrole eist bij een ingestelde sleutel dat de modelroute echt slaagt.
+
+[GitHub Models is sinds 30 juli 2026 beëindigd](https://docs.github.com/en/github-models), inclusief de inference-API. Het project gebruikt die dienst en de bijbehorende tokenpermissie niet meer. GitHub-toegangssleutels worden uitsluitend voor repositorybeheer gebruikt.
 
 ## Cloudpublicatie voorbereiden
 
@@ -91,7 +93,7 @@ Er zijn dagelijks pogingen om 06:00, 07:00 en 08:00 UTC. De updater controleert 
 
 De workflow kan ook handmatig worden gestart via **Actions → Ochtendnieuws publiceren → Run workflow** op de standaardbranch. Zonder `force` mag een bestaande editie opnieuw worden gepubliceerd; een nieuwe editie wordt alleen gemaakt als die voor vandaag nog ontbreekt. De optionele `force` vervangt de editie van vandaag. Parallelle publicatieruns wachten op elkaar; een onverwachte Git-pushconflict stopt de publicatie in plaats van wijzigingen te overschrijven.
 
-De updatejob vraagt `contents: write` en `models: read`; de deployjob vraagt alleen `pages: write` en `id-token: write`. De ingebouwde `GITHUB_TOKEN` probeert GitHub Models te gebruiken. Als het account daarvoor geen toegang heeft, kan als alternatief `OPENAI_API_KEY` als repositorysecret worden ingesteld. Zonder werkend model kan de Nederlandse bronfallback actief zijn, mits er voldoende geschikte berichten zijn. Controleer de eerste echte run om de beschikbaarheid vast te stellen.
+De updatejob vraagt `contents: write`; de deployjob vraagt alleen `pages: write` en `id-token: write`. De controleworkflow heeft uitsluitend `contents: read`. De standaardnieuwsupdate heeft geen aanvullende AI-dienst of betaalde API nodig.
 
 ## Controles
 

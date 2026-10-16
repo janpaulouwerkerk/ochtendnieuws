@@ -1,0 +1,38 @@
+name: Controleer beschikbare Copilot-toegang
+
+on:
+  workflow_dispatch:
+
+permissions:
+  copilot-requests: write
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Installeer de officiële Copilot CLI
+        run: npm install --global @github/copilot
+      - name: Controleer toegang zonder repositorybestanden of tools
+        working-directory: ${{ runner.temp }}
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PY'
+          import os
+          import subprocess
+
+          result = subprocess.run(
+              ['copilot', '-p', 'Antwoord uitsluitend met OK.', '-s', '--no-ask-user', '--model', 'gpt-4.1'],
+              capture_output=True, text=True, timeout=180,
+          )
+          if result.returncode != 0 or result.stdout.strip() != 'OK':
+              message = result.stderr[-4000:].replace(os.environ['GITHUB_TOKEN'], '[redacted]')
+              for original, escaped in [('%', '%25'), ('\r', '%0D'), ('\n', '%0A')]:
+                  message = message.replace(original, escaped)
+              print('::error title=Copilot-toegang niet beschikbaar::' + message)
+              raise SystemExit('Copilot gaf geen geldige bevestiging; er is geen abonnement aangepast.')
+          print('Bestaande Copilot-toegang bevestigd; geen repositorybestanden geopend of gewijzigd.')
+          PY

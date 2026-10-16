@@ -45,7 +45,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-      models: read
     steps:
       - uses: actions/checkout@v4
         with:
@@ -55,7 +54,6 @@ jobs:
           python-version: '3.12'
       - name: Maak of behoud de editie van vandaag
         env:
-          GITHUB_TOKEN: ${{ github.token }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           EVENT_NAME: ${{ github.event_name }}
           FORCE: ${{ inputs.force || false }}
