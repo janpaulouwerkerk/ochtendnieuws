@@ -1,0 +1,13 @@
+{
+  "name": "ochtend-ai-nieuws",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dagelijkse AI-briefing, zelfstandig en zonder plug-ins.",
+  "scripts": {
+    "dev": "python3 -m http.server 3000 --directory public",
+    "start": "python3 -m http.server 3000 --directory public",
+    "test": "python3 -m unittest discover -s tests -v && node --check public/app.js",
+    "preview": "python3 scripts/build_preview.py",
+    "update-news": "python3 scripts/update_news.py"
+  }
+}

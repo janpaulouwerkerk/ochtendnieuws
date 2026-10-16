@@ -1,0 +1,95 @@
+{
+  "title": "Ochtend.",
+  "description": "Vijf AI-ontwikkelingen, helder uitgelegd. Met bronnen, context en een idee voor de praktijk.",
+  "timeZone": "Europe/Amsterdam",
+  "publicationTime": "08:00",
+  "generatedAt": "2026-10-16T06:48:02Z",
+  "sourceNote": "Deze editie is samengesteld uit vijf gecontroleerde openbare bronpagina's van Google en OpenAI, gepubliceerd op 13, 14 en 15 oktober 2026. Twee berichten zijn van de afgelopen 24 uur; drie geven relevante ontwikkelingen van eerder deze week weer. Het zijn primaire leveranciersbronnen, waaronder twee klantverhalen. Prestatieclaims zijn niet onafhankelijk geverifieerd. Praktijkideeën zijn suggesties van de redactie. Beschikbaarheid kan afhangen van land, abonnement of toelating.",
+  "editions": [
+    {
+      "date": "2026-10-16",
+      "publishedAt": "2026-10-16T08:00:00+02:00",
+      "articles": [
+        {
+          "id": "gemini-4-argon-beschikbaar-20261013",
+          "title": "Google brengt Gemini 4 Argon naar API en betaalde Gemini-abonnementen",
+          "summary": "Google heeft Gemini 4 Argon beschikbaar gemaakt voor ontwikkelaars via de betaalde Gemini API en voor gebruikers met een Google AI Pro- of Ultra-abonnement in de Gemini-app. Het model richt zich onder meer op programmeren, documentanalyse en wetenschappelijke taken. De introductieprijs voor de publieke API is 2 dollar per miljoen invoertokens en 10 dollar per miljoen uitvoertokens. Google meldt dat deze tarieven na 30 november verdubbelen. De voorbeelden en verbetercijfers in de aankondiging zijn afkomstig van Google en zijn partners.",
+          "importance": "Een nieuw beschikbaar model is vooral relevant als het jouw eigen taken beter of goedkoper uitvoert. De aangekondigde prijswijziging maakt een kostenberekening voor structureel gebruik extra belangrijk.",
+          "opportunity": "Vergelijk Argon met je huidige model op tien geanonimiseerde documenten. Meet juistheid, benodigde correcties en kosten per afgeronde taak voordat je een workflow overzet.",
+          "status": "Beschikbaar",
+          "newsDate": "2026-10-13",
+          "publishedAt": "2026-10-13T16:00:00+00:00",
+          "category": "Modellen",
+          "source": {
+            "name": "Google — The Keyword",
+            "url": "https://blog.google/innovation-and-ai/models-and-research/gemini-models/introducing-gemini-4-argon/"
+          },
+          "image": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/gemini-4-argon__blog-header__27.max-600x600.format-webp.webp",
+          "imageAlt": "Officiële Google-illustratie bij de introductie van Gemini 4 Argon"
+        },
+        {
+          "id": "rosalind-academic-plan-20261015",
+          "title": "OpenAI biedt Amerikaanse onderzoekslabs gesponsorde toegang tot GPT-Rosalind",
+          "summary": "Met het Rosalind Academic Plan kunnen daarvoor in aanmerking komende universitaire labs in de Verenigde Staten maximaal dertig Business Standard-plekken krijgen, voor maximaal twaalf maanden zonder abonnementskosten. Toegang tot het gespecialiseerde levenswetenschappelijke model GPT-Rosalind vereist afzonderlijke goedkeuring. API-toegang is niet inbegrepen. De aankondiging beschrijft ondersteuning bij onder meer literatuuronderzoek en biologisch onderzoek; zij bewijst geen nieuwe medische doorbraak. Nederlandse labs vallen niet onder de beschreven Amerikaanse regeling.",
+          "importance": "De ontwikkeling laat zien hoe gespecialiseerde AI-modellen via toegangsprogramma's bij onderzoekers terechtkomen. Gratis werkplekken betekenen hier geen onbeperkte of algemeen beschikbare toegang tot het model.",
+          "opportunity": "Maak binnen een onderzoeksteam een lijst met literatuurtaken waarbij bronvermelding controleerbaar is. Gebruik die als beoordelingskader voor een eventuele toekomstige proef met een gespecialiseerd model.",
+          "status": "Aangekondigd",
+          "newsDate": "2026-10-15",
+          "publishedAt": "2026-10-15T19:00:00+00:00",
+          "category": "Onderzoek",
+          "source": {
+            "name": "OpenAI",
+            "url": "https://openai.com/index/introducing-the-rosalind-academic-plan"
+          }
+        },
+        {
+          "id": "google-ai-search-bronlinks-20261015",
+          "title": "Google maakt bronlinks in AI-zoekantwoorden zichtbaarder",
+          "summary": "Google kondigt aan links hoger en vaker direct in antwoorden van AI Mode en AI Overviews te tonen. Ook worden nieuwsblokken naar meer talen en regio's uitgerold en krijgen sommige gerelateerde artikelen een opvallendere presentatie. Een apart blok met officiële websites en aanklikbare makersprofielen zijn nog tests. De publicatie noemt geen volledige landenlijst of datum waarop alle onderdelen voor Nederlandse gebruikers beschikbaar zijn.",
+          "importance": "Zichtbare bronnen maken het makkelijker om een AI-antwoord na te lopen. Voor uitgevers is dit een verandering in presentatie; de aankondiging toont nog niet aan dat hun bezoekersaantallen daardoor herstellen.",
+          "opportunity": "Controleer voor een paar veelgestelde vragen of je officiële informatie actueel en duidelijk vindbaar is. Open bij AI-antwoorden de genoemde bronnen en vergelijk of zij de samenvatting werkelijk ondersteunen.",
+          "status": "Aangekondigd",
+          "newsDate": "2026-10-15",
+          "publishedAt": "2026-10-15T16:00:00+00:00",
+          "category": "Toepassingen",
+          "source": {
+            "name": "Google — The Keyword",
+            "url": "https://blog.google/products-and-platforms/products/search/updates-ai-mode-overviews-explore-web/"
+          },
+          "image": "https://storage.googleapis.com/gweb-uniblog-publish-prod/images/Search_Hero_11msfEh.max-600x600.format-webp.webp",
+          "imageAlt": "Officiële Google-illustratie bij de vernieuwing van bronlinks in AI Search"
+        },
+        {
+          "id": "amp-agents-buiten-code-20261014",
+          "title": "Amp beschrijft hoe zijn agents ook documentatie en ontwerp oppakken",
+          "summary": "In een nieuw klantverhaal van OpenAI beschrijft Amp hoe zijn team agents gebruikt voor documentatie, paginaontwerp en marketing, naast softwareontwikkeling. Amp heeft een integratie met Sign in with ChatGPT gelanceerd. Het bedrijf heeft ook Puck aangekondigd, een gesprekspartner die andere agents helpt starten en aansturen. Het verhaal geeft praktijkvoorbeelden en uitspraken van de Amp-directeur; het bevat geen onafhankelijke vergelijking of bewijs dat elke gebruiker dezelfde resultaten haalt.",
+          "importance": "Agents verschuiven van losse programmeertaken naar verschillende stappen rond een product. De beschikbare integratie is concreet; bredere beloften over zelfstandig werken vragen om toetsing in een eigen proces.",
+          "opportunity": "Laat een agent bij een kleine softwarewijziging ook een concept voor de gebruikersdocumentatie maken. Beoordeel code en uitleg afzonderlijk en laat een collega beide goedkeuren voor publicatie.",
+          "status": "Beschikbaar",
+          "newsDate": "2026-10-14",
+          "publishedAt": "2026-10-14T12:00:00+00:00",
+          "category": "Agents",
+          "source": {
+            "name": "OpenAI — klantverhaal over Amp",
+            "url": "https://openai.com/index/amp-beyond-coding"
+          }
+        },
+        {
+          "id": "sullivan-cromwell-agreement-analyzer-20261015",
+          "title": "Advocatenkantoor bouwt AI-hulp die contracten met eigen precedenten vergelijkt",
+          "summary": "Sullivan & Cromwell heeft samen met OpenAI Agreement Analyzer ontwikkeld. Volgens het gepubliceerde klantverhaal combineert de interne toepassing conceptcontracten met geselecteerde precedenten, onderhandelingsrichtlijnen en ChatGPT Enterprise. Zij levert aandachtspunten en voorgestelde wijzigingen die advocaten kunnen controleren en verwerpen. De beschreven aanpak maakt onderliggende bronnen en onzekerheid zichtbaar. Er is geen openbare productlancering aangekondigd en het artikel bevat geen onafhankelijk gemeten foutpercentage.",
+          "importance": "Dit is een concreet voorbeeld van AI die wordt gekoppeld aan de kennis en werkwijze van een organisatie. De menselijke beoordeling en herleidbaarheid van bevindingen blijven onderdelen van het proces.",
+          "opportunity": "Probeer bij een afgebakende interne documentcontrole elk AI-aandachtspunt te laten verwijzen naar de relevante passage en richtlijn. Houd ongeverifieerde bevindingen apart en laat een bevoegde medewerker beslissen.",
+          "status": "Beschikbaar",
+          "newsDate": "2026-10-15",
+          "publishedAt": "2026-10-15T00:00:00+00:00",
+          "category": "Toepassingen",
+          "source": {
+            "name": "OpenAI — klantverhaal over Sullivan & Cromwell",
+            "url": "https://openai.com/index/sullivan-cromwell"
+          }
+        }
+      ]
+    }
+  ]
+}

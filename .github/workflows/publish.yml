@@ -1,0 +1,102 @@
+name: Ochtendnieuws publiceren
+
+on:
+  schedule:
+    # Een van deze pogingen valt in het lokale venster van 08:00–10:00.
+    # De updater bewaakt Europe/Amsterdam en slaat een bestaande editie over.
+    - cron: '0 6 * * *'
+    - cron: '0 7 * * *'
+    - cron: '0 8 * * *'
+  workflow_dispatch:
+    inputs:
+      force:
+        description: 'Vervang de editie van vandaag (anders bestaande editie behouden)'
+        type: boolean
+        required: false
+        default: false
+
+permissions: {}
+
+concurrency:
+  group: ochtendnieuws-publicatie
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    if: github.ref == format('refs/heads/{0}', github.event.repository.default_branch)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Controleer updater en website
+        run: |
+          python -m unittest discover -s tests -v
+          node --check public/app.js
+          python -m py_compile scripts/update_news.py scripts/deploy_github.py
+
+  refresh:
+    needs: validate
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      models: read
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Maak of behoud de editie van vandaag
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          EVENT_NAME: ${{ github.event_name }}
+          FORCE: ${{ inputs.force || false }}
+        run: |
+          args=()
+          if [ "$EVENT_NAME" = "schedule" ]; then
+            args+=(--require-morning-window)
+          fi
+          if [ "$FORCE" = "true" ]; then
+            args+=(--force)
+          fi
+          python scripts/update_news.py "${args[@]}"
+      - name: Controleer de te publiceren editie
+        run: |
+          python -m unittest discover -s tests -v
+          node --check public/app.js
+      - name: Bewaar de nieuwsdata
+        env:
+          DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
+        run: |
+          git add -- public/data
+          if ! git diff --cached --quiet; then
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git commit -m "Werk dagelijkse nieuwseditie bij"
+            git push origin "HEAD:${DEFAULT_BRANCH}"
+          fi
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: public
+
+  deploy:
+    needs: refresh
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Publiceer op GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

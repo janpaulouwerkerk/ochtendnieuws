@@ -1,0 +1,14 @@
+{
+  "feeds": [
+    {"name": "Tweakers", "url": "https://tweakers.net/feeds/mixed.xml", "language": "nl"},
+    {"name": "NU.nl Tech", "url": "https://www.nu.nl/rss/Tech", "language": "nl"},
+    {"name": "NOS Tech", "url": "https://feeds.nos.nl/nosnieuwstech", "language": "nl"},
+    {"name": "Bright", "url": "https://www.bright.nl/rss.xml", "language": "nl"},
+    {"name": "OpenAI", "url": "https://openai.com/news/rss.xml", "language": "en"},
+    {"name": "Google DeepMind", "url": "https://deepmind.google/blog/rss.xml", "language": "en"},
+    {"name": "Google AI", "url": "https://blog.google/technology/ai/rss/", "language": "en"},
+    {"name": "TechCrunch AI", "url": "https://techcrunch.com/category/artificial-intelligence/feed/", "language": "en"},
+    {"name": "Ars Technica", "url": "https://feeds.arstechnica.com/arstechnica/technology-lab", "language": "en"},
+    {"name": "The Verge AI", "url": "https://www.theverge.com/rss/ai-artificial-intelligence/index.xml", "language": "en"}
+  ]
+}

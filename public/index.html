@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="nl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f5f5f2" />
+    <meta name="description" content="Begin je dag met vijf belangrijke AI-ontwikkelingen. Helder samengevat, met de oorspronkelijke bron en de kansen voor de praktijk." />
+    <title>Ochtend. — Je dagelijkse AI-briefing</title>
+    <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+    <link rel="stylesheet" href="styles.css" />
+    <script src="app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#nieuws">Naar de nieuwsberichten</a>
+    <header class="site-header">
+      <div class="navigation page-width">
+        <a class="wordmark" href="./" aria-label="Ochtend. startpagina">ochtend<span>.</span></a>
+        <nav class="desktop-nav" aria-label="Hoofdnavigatie">
+          <a href="#nieuws" class="nav-link active">De briefing</a>
+          <a href="#archief" class="nav-link">Eerdere edities</a>
+          <a href="#over" class="nav-link">Over Ochtend.</a>
+        </nav>
+        <div class="navigation-end">
+          <span class="daily-label"><span class="live-dot"></span> Elke dag om 08:00</span>
+          <button class="icon-button search-toggle" type="button" aria-label="Zoeken in de briefing" aria-expanded="false" aria-controls="search-panel">
+            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.5 4.5"></path></svg>
+          </button>
+        </div>
+      </div>
+      <div id="search-panel" class="search-panel" hidden>
+        <div class="page-width search-inner">
+          <label for="search-input" class="sr-only">Zoeken in de geselecteerde editie</label>
+          <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"></circle><path d="m16 16 4.5 4.5"></path></svg>
+          <input id="search-input" type="search" placeholder="Wat wil je weten over AI?" autocomplete="off" />
+          <button type="button" class="text-button" id="close-search">Sluiten <span aria-hidden="true">×</span></button>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="intro page-width" aria-labelledby="intro-heading">
+        <div class="intro-copy">
+          <p class="eyebrow"><span class="sun-symbol" aria-hidden="true">☼</span> JOUW DAGELIJKSE AI-BRIEFING</p>
+          <h1 id="intro-heading">Een nieuwe dag.<br /><span>Een stap vooruit.</span></h1>
+          <p class="intro-description">De vijf AI-ontwikkelingen die ertoe doen.<br class="desktop-break" /> Helder uitgelegd. Met de kansen voor jou.</p>
+        </div>
+        <div class="intro-art" aria-hidden="true">
+          <div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="orbit orbit-three"></div>
+          <div class="sun-core"></div><div class="sun-shadow"></div>
+          <span class="art-caption">EEN HELDER BEGIN.</span>
+          <span class="art-coordinate">52° 22′ N &nbsp; 4° 54′ E</span>
+        </div>
+      </section>
+
+      <section class="edition-section page-width" id="nieuws" aria-labelledby="edition-heading">
+        <div class="section-topline">
+          <div>
+            <p class="eyebrow">GROOT IN AI. KLEIN IN JE AGENDA.</p>
+            <h2 id="edition-heading">De ochtendeditie<span class="heading-dot">.</span></h2>
+          </div>
+          <div class="edition-date-wrap">
+            <label for="edition-select" class="sr-only">Kies een editie</label>
+            <select id="edition-select" disabled><option>Edities laden…</option></select>
+            <span class="edition-update" id="edition-update">Elke ochtend een frisse blik</span>
+          </div>
+        </div>
+        <div class="filter-bar" id="filter-bar" hidden>
+          <div class="category-filters" id="category-filters" role="group" aria-label="Filter op onderwerp"></div>
+          <span class="article-count" id="article-count" role="status"></span>
+        </div>
+        <div id="news-content" aria-busy="true">
+          <div class="loading-state" role="status"><span class="loading-ring" aria-hidden="true"></span>De briefing wordt opgehaald…</div>
+        </div>
+        <p id="source-note" class="source-note" hidden></p>
+      </section>
+
+      <section class="ritual-section" aria-labelledby="ritual-heading">
+        <div class="page-width ritual-inner">
+          <div class="ritual-symbol" aria-hidden="true">☼</div>
+          <div class="ritual-copy"><p class="eyebrow">EEN KLEIN OCHTENDRITUEEL</p><h2 id="ritual-heading">Voor op de dag.<br />Bij in de wereld.</h2><p>Elke ochtend vijf verhalen over modellen, agents en de toepassingen die onze manier van werken veranderen.</p></div>
+          <div class="ritual-meta"><div><strong>05</strong><span>verhalen per editie</span></div><div><strong>08:00</strong><span>tijd voor een frisse blik</span></div><div class="ritual-bottom"><span class="live-dot"></span> Automatisch. Elke ochtend.</div></div>
+        </div>
+      </section>
+
+      <section class="archive-section page-width" id="archief" aria-labelledby="archive-heading">
+        <div class="section-topline"><div><p class="eyebrow">EVEN TERUGBLIKKEN</p><h2 id="archive-heading">Eerdere edities<span class="heading-dot">.</span></h2></div><p class="section-description">Het nieuws verandert.<br />Het overzicht blijft.</p></div>
+        <div id="archive-content"><p class="archive-empty">Eerdere edities verschijnen hier zodra ze beschikbaar zijn.</p></div>
+      </section>
+
+      <section class="about-section page-width" id="over" aria-labelledby="about-heading">
+        <span class="about-mark" aria-hidden="true">o.</span>
+        <div><p class="eyebrow">OVER OCHTEND.</p><h2 id="about-heading">Minder ruis.<br />Meer richting.</h2></div>
+        <div class="about-text"><p>AI gaat snel. Ochtend. helpt je bij te blijven met een selectie van vijf belangrijke ontwikkelingen, bij voorkeur uit de afgelopen 24 uur.</p><p>Van grote AI-labs tot praktische toepassingen. Met een samenvatting, de betekenis en een idee om zelf mee aan de slag te gaan. Elk verhaal linkt naar de oorspronkelijke bron.</p><p class="about-note">Automatisch samengesteld. Controleer belangrijke details altijd bij de bron.</p></div>
+      </section>
+    </main>
+
+    <footer class="site-footer"><div class="page-width footer-inner"><a class="wordmark" href="./" aria-label="Ochtend. startpagina">ochtend<span>.</span></a><span>Je dagelijkse voorsprong in AI.</span><a href="#nieuws">Terug naar boven <span aria-hidden="true">↑</span></a></div></footer>
+
+    <dialog id="article-dialog" class="article-dialog" aria-labelledby="dialog-title">
+      <div class="dialog-topbar"><a class="wordmark" href="./" aria-label="Ochtend. startpagina">ochtend<span>.</span></a><button type="button" class="dialog-close icon-button" aria-label="Artikel sluiten">×</button></div>
+      <div id="dialog-content"></div>
+    </dialog>
+    <noscript><div class="noscript-note">Schakel JavaScript in om de dagelijkse briefing en eerdere edities te bekijken.</div></noscript>
+  </body>
+</html>

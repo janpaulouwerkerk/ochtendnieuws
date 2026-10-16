@@ -1,0 +1,11 @@
+{
+  "title": "Ochtend.",
+  "description": "Je dagelijkse AI-briefing",
+  "timeZone": "Europe/Amsterdam",
+  "publicationTime": "08:00",
+  "morningWindowHours": 2,
+  "articlesPerEdition": 5,
+  "preferredHours": 24,
+  "fallbackDays": 7,
+  "model": "openai/gpt-4.1-mini"
+}
